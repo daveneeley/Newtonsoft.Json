@@ -1,4 +1,8 @@
-﻿properties { 
+﻿param(
+	$buildCounter
+)
+
+properties { 
   $zipFileName = "Json60r3.zip"
   $majorVersion = "6.0"
   $majorWithReleaseVersion = "6.0.3"
@@ -18,9 +22,9 @@
   $workingDir = "$baseDir\Working"
   $builds = @(
     @{Name = "Newtonsoft.Json"; TestsName = "Newtonsoft.Json.Tests"; Constants=""; FinalDir="Net45"; NuGetDir = "net45"; Framework="net-4.0"; Sign=$true},
-    @{Name = "Newtonsoft.Json.Portable"; TestsName = "Newtonsoft.Json.Tests.Portable"; Constants="PORTABLE"; FinalDir="Portable"; NuGetDir = "portable-net45+wp80+win8+wpa81"; Framework="net-4.0"; Sign=$true},
-    @{Name = "Newtonsoft.Json.Portable40"; TestsName = "Newtonsoft.Json.Tests.Portable40"; Constants="PORTABLE40"; FinalDir="Portable40"; NuGetDir = "portable-net40+sl4+wp7+win8+wpa81"; Framework="net-4.0"; Sign=$true},
-    @{Name = "Newtonsoft.Json.WinRT"; TestsName = $null; Constants="NETFX_CORE"; FinalDir="WinRT"; NuGetDir = "netcore45"; Framework="net-4.5"; Sign=$true},
+    # @{Name = "Newtonsoft.Json.Portable"; TestsName = "Newtonsoft.Json.Tests.Portable"; Constants="PORTABLE"; FinalDir="Portable"; NuGetDir = "portable-net45+wp80+win8+wpa81"; Framework="net-4.0"; Sign=$true},
+    # @{Name = "Newtonsoft.Json.Portable40"; TestsName = "Newtonsoft.Json.Tests.Portable40"; Constants="PORTABLE40"; FinalDir="Portable40"; NuGetDir = "portable-net40+sl4+wp7+win8+wpa81"; Framework="net-4.0"; Sign=$true},
+    # @{Name = "Newtonsoft.Json.WinRT"; TestsName = $null; Constants="NETFX_CORE"; FinalDir="WinRT"; NuGetDir = "netcore45"; Framework="net-4.5"; Sign=$true},
     @{Name = "Newtonsoft.Json.Net40"; TestsName = "Newtonsoft.Json.Tests.Net40"; Constants="NET40"; FinalDir="Net40"; NuGetDir = "net40"; Framework="net-4.0"; Sign=$true},
     @{Name = "Newtonsoft.Json.Net35"; TestsName = "Newtonsoft.Json.Tests.Net35"; Constants="NET35"; FinalDir="Net35"; NuGetDir = "net35"; Framework="net-2.0"; Sign=$true},
     @{Name = "Newtonsoft.Json.Net20"; TestsName = "Newtonsoft.Json.Tests.Net20"; Constants="NET20"; FinalDir="Net20"; NuGetDir = "net20"; Framework="net-2.0"; Sign=$true}
@@ -49,15 +53,18 @@ task Clean {
 task Build -depends Clean { 
   Write-Host -ForegroundColor Green "Updating assembly version"
   Write-Host
-  Update-AssemblyInfoFiles $sourceDir ($majorVersion + '.0.0') $version
+  
 
   foreach ($build in $builds)
   {
     $name = $build.Name
     $finalDir = $build.FinalDir
     $sign = ($build.Sign -and $signAssemblies)
-
-    Write-Host -ForegroundColor Green "Building " $name
+	$completeVersion = $version + ($build.NuGetDir).Substring($build.NuGetDir.Length - 3, $build.NuGetDir.Length - 1) # Get the last two characters of NuGetDir, which should be the .net version.
+	
+	Update-AssemblyInfoFiles $sourceDir ($majorVersion + '.0.0') $completeVersion
+    
+	Write-Host -ForegroundColor Green "Building " $name
     Write-Host -ForegroundColor Green "Signed " $sign
 
     Write-Host
@@ -170,17 +177,13 @@ function GetConstants($constants, $includeSigned)
 
 function GetVersion($majorVersion)
 {
-    $now = [DateTime]::Now
-    
-    $year = $now.Year - 2000
-    $month = $now.Month
-    $totalMonthsSince2000 = ($year * 12) + $month
-    $day = $now.Day
-    $minor = "{0}{1:00}" -f $totalMonthsSince2000, $day
-    
-    $hour = $now.Hour
-    $minute = $now.Minute
-    $revision = "{0:00}{1:00}" -f $hour, $minute
+	$buildCountFinalLength = 3 # The number of digits to represent the build count.
+	$minor = $buildCounter
+	
+	# Prepend zeros until the counter is $buildCountFinalLength digits long.
+    while($minor.Length < $buildCountFinalLength){
+		$minor = "0" + $minor
+	}
     
     return $majorVersion + "." + $minor
 }
@@ -196,7 +199,7 @@ function Update-AssemblyInfoFiles ([string] $sourceDir, [string] $assemblyVersio
         
         $filename = $_.Directory.ToString() + '\' + $_.Name
         Write-Host $filename
-        $filename + ' -> ' + $version
+        $filename + ' -> ' + $completeVersion
     
         (Get-Content $filename) | ForEach-Object {
             % {$_ -replace $assemblyVersionPattern, $assemblyVersion } |

@@ -1,5 +1,9 @@
-﻿cls
+﻿param(
+	$buildCounter
+)
+
+cls
 
 Import-Module '..\Tools\PSake\psake.psm1'
-Invoke-psake '.\build.ps1' Test -framework 3.5
+Invoke-psake '.\build.ps1' Test -framework 3.5 -parameters @{"buildCounter"=$buildCounter;}
 Remove-Module psake
