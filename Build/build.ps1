@@ -60,7 +60,9 @@ task Build -depends Clean {
     $name = $build.Name
     $finalDir = $build.FinalDir
     $sign = ($build.Sign -and $signAssemblies)
-	$completeVersion = $version + ($build.NuGetDir).Substring($build.NuGetDir.Length - 3, $build.NuGetDir.Length - 1) # Get the last two characters of NuGetDir, which should be the .net version.
+	$completeVersion = $version.ToString() + $finalDir.SubString($finalDir.Length - 2) # Get the last two characters of NuGetDir, which should be the .net version.
+	
+	Write-Host -ForegroundColor Red "CompleteVersion " $completeVersion
 	
 	Update-AssemblyInfoFiles $sourceDir ($majorVersion + '.0.0') $completeVersion
     
@@ -178,23 +180,21 @@ function GetConstants($constants, $includeSigned)
 function GetVersion($majorVersion)
 {
 	$buildCountFinalLength = 3 # The number of digits to represent the build count.
-	$minor = $buildCounter
-	
-	# Prepend zeros until the counter is $buildCountFinalLength digits long.
-    while($minor.Length < $buildCountFinalLength){
-		$minor = "0" + $minor
-	}
-    
+	$minor = $buildCounter.ToString().PadLeft('3','0')
+	Write-Host -ForegroundColor Red "Minor Version: " $minor   
     return $majorVersion + "." + $minor
 }
 
 function Update-AssemblyInfoFiles ([string] $sourceDir, [string] $assemblyVersionNumber, [string] $fileVersionNumber)
 {
-    $assemblyVersionPattern = 'AssemblyVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
-    $fileVersionPattern = 'AssemblyFileVersion\("[0-9]+(\.([0-9]+|\*)){1,3}"\)'
+    $assemblyVersionPattern = 'AssemblyVersion\(".*"\)'
+    $fileVersionPattern = 'AssemblyFileVersion\(".*"\)'
     $assemblyVersion = 'AssemblyVersion("' + $assemblyVersionNumber + '")';
     $fileVersion = 'AssemblyFileVersion("' + $fileVersionNumber + '")';
     
+	Write-Host -ForegroundColor Red "File Version: " $fileVersion
+	Write-Host -ForegroundColor Red "Assembly Version: " $assemblyVersion
+	
     Get-ChildItem -Path $sourceDir -r -filter AssemblyInfo.cs | ForEach-Object {
         
         $filename = $_.Directory.ToString() + '\' + $_.Name
