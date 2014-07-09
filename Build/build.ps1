@@ -87,8 +87,7 @@ task Package -depends Build {
     $finalDir = $build.FinalDir
     
     robocopy "$sourceDir\Newtonsoft.Json\bin\Release\$finalDir" $workingDir\Package\Bin\$finalDir *.dll *.pdb *.xml /NP /XO /XF *.CodeAnalysisLog.xml | Out-Default
-	$completeAssemblyVersion = Get-ChildItem "$sourceDir\Newtonsoft.Json\bin\Release\$finalDir" | Get-ItemProperty -Name VersionInfo | Select-String -Pattern "ProductVersion:\s+(.*)" -All | %{ $_.matches } | %{ $_.Value } | Select-String -pattern "[0-9.]+" -All | %{ $_.matches } | %{ $_.Value }
-	Get-ChildItem "$sourceDir\Newtonsoft.Json\bin\Release\$finalDir\\*.dll" | Rename-Item -NewName { ($_.BaseName, $completeAssemblyVersion, $_.Extension) -join "" }
+	Get-ChildItem "$sourceDir\Newtonsoft.Json\bin\Release\$finalDir\\*.dll" | Rename-Item -NewName { ($_.BaseName, ".", $finalDir, $_.Extension) -join "" }
   }
   
   if ($buildNuGet)
