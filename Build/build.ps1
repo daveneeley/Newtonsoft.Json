@@ -87,7 +87,6 @@ task Package -depends Build {
     $finalDir = $build.FinalDir
     
     robocopy "$sourceDir\Newtonsoft.Json\bin\Release\$finalDir" $workingDir\Package\Bin\$finalDir *.dll *.pdb *.xml /NP /XO /XF *.CodeAnalysisLog.xml | Out-Default
-	Get-ChildItem "$sourceDir\Newtonsoft.Json\bin\Release\$finalDir\\*.dll" | Rename-Item -NewName { ($_.BaseName, ".", $finalDir, $_.Extension) -join "" }
   }
   
   if ($buildNuGet)
