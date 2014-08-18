@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Newtonsoft.Json</RootNamespace>
-    <AssemblyName>Newtonsoft.Json</AssemblyName>
+    <AssemblyName>Newtonsoft.Json.Net35</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
@@ -52,7 +52,7 @@
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Net35\Newtonsoft.Json.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Net35\Newtonsoft.Json.Net35.xml</DocumentationFile>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRules>
     </CodeAnalysisRules>
@@ -65,7 +65,7 @@
     <DefineConstants>TRACE;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Net35\Newtonsoft.Json.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Net35\Newtonsoft.Json.Net35.xml</DocumentationFile>
     <CodeAnalysisRuleSet>Newtonsoft.Json.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
